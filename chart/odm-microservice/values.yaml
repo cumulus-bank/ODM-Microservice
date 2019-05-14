@@ -1,8 +1,8 @@
 replicaCount: 2
 
 metadata:
- name: odmsvc 
- label: odmsvc
+ name: odmbanksvc 
+ label: odmbanksvc
 
 readinessProbe:
   path: /healthz
@@ -18,7 +18,7 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
 image:
-  name: odmsvc
+  name: odmbanksvc
   imageName: "mycluster.icp:8500/default/odm-microservice" 
   imagePullPolicy: Always
   ports:
@@ -36,7 +36,7 @@ image:
       command: ["/bin/bash", "-c", "sleep 20"]
 hpa:
   metadata:
-    name: odmsvcmicroservicehpa
+    name: odmbanksvcmicroservicehpa
   spec:
     maxReplicas: 10
     minReplicas: 2
@@ -49,7 +49,7 @@ hpa:
     memory:
       targetAverageUtilization: 70
   scaleTargetRef:  
-    name: odmsvc
+    name: odmbanksvc
 
 envOfSecrets:
   envSECRET:
@@ -62,20 +62,20 @@ envOfConfigmaps:
   envODM:
     name: ODM
     configMapKeyRef:
-      name: env-database
+      name: env-database-cumulus
       key: ODM
 
 
 service:
   serviceMetadata:
-    name: odmsvc
+    name: odmbanksvc
     labels:
-      app: odmsvc
+      app: odmbanksvc
   selector:
-    selectorName: odmsvc
+    selectorName: odmbanksvc
   servicePortConfiguration:
     protocol: TCP
-    name: odmsvc
+    name: odmbanksvc
     type: ClusterIP
     port: 3005
     targetPort: 3005

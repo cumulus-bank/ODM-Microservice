@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: env-database
+  name: env-database-cumulus
   namespace: default
 data:
   ODM: 'http://cumulusbankodm-ibm-odm-dev.default:9060/DecisionService/rest/BankingDemo/1.0/getCreditCardOffers/1.0'
