@@ -1,0 +1,99 @@
+replicaCount: 2
+namespace: "kubeapp"
+metadata:
+ name: odm-svc 
+ label: odm-svc
+
+odm:
+  link: ""
+readinessProbe:
+  path: /healthz
+  port: 3005
+  initialDelaySeconds: 10
+  timeoutSeconds: 2
+  periodSeconds: 300
+
+livenessProbe:
+  path: /healthz
+  port: 3005
+  initialDelaySeconds: 10
+  timeoutSeconds: 2
+  periodSeconds: 300
+image:
+  name: odm-svc
+  imageName: "odm-svc" 
+  imagePullPolicy: Always
+  ports:
+    containerPort: 3005
+  requests:
+    cpu: "50m"
+    memory: "300Mi"
+  limits:
+    cpu: "100m"
+    memory: "400Mi"
+  maxSurge: 1
+  maxUnavailable: 0
+  lifecycle:
+    preStop:
+      command: ["/bin/bash", "-c", "sleep 20"]
+      
+hpa:
+  metadata:
+    name: odm-svcmicroservicehpa
+  spec:
+    maxReplicas: 10
+    minReplicas: 2
+  metrics:
+    pods:
+      targetAverageValue: 30
+    resource:
+      name: cpu
+      targetAverageUtilization: 70
+    memory:
+      targetAverageUtilization: 70
+  scaleTargetRef:  
+    name: odm-svc
+
+envOfConfigmaps:
+  envODM:
+    name: ODM
+    configMapKeyRef:
+      name: odmmicroservice
+      key: ODM
+
+service:
+  serviceMetadata:
+    name: odm-svc
+    labels:
+      app: odm-svc
+  selector:
+    selectorName: odm-svc
+  servicePortConfiguration:
+    protocol: TCP
+    name: odm-svc
+    type: ClusterIP
+    port: 3005
+    targetPort: 3005
+
+
+imagestream:
+  name:  odm-svc
+  label: odm-svc
+
+buildconfig:
+  uri: "https://github.com/cumulus-bank/ODM-Microservice.git"
+  branch: "master"
+  name: "odm-svc"
+  imagename: "odm-svc:latest"
+  secret1: $(head -c 24 /dev/random | base64)
+  secret2: $(head -c 24 /dev/random | base64)
+
+routes:
+  host: "odm-svc-kubeapp.apps.9.30.210.207.nip.io"
+  targetPort: 3005
+  name: odm-svc
+  weight: 100
+
+
+nameOverride: ""
+fullnameOverride: ""

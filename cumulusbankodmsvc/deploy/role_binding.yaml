@@ -1,0 +1,11 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cumulusbankodmsvc
+subjects:
+- kind: ServiceAccount
+  name: cumulusbankodmsvc
+roleRef:
+  kind: Role
+  name: cumulusbankodmsvc
+  apiGroup: rbac.authorization.k8s.io

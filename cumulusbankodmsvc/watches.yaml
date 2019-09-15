@@ -1,0 +1,5 @@
+---
+- version: v1alpha1
+  group: ibm.odmsvc.com
+  kind: Odmsvc
+  chart: /opt/helm/helm-charts/odmsvc

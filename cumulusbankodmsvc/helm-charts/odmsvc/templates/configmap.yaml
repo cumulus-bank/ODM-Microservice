@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: odmmicroservice
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.metadata.name }} 
+data:
+  ODM: {{ .Values.odm.link }} 

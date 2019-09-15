@@ -1,0 +1,19 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: odmsvcs.ibm.odmsvc.com
+spec:
+  group: ibm.odmsvc.com
+  names:
+    kind: Odmsvc
+    listKind: OdmsvcList
+    plural: odmsvcs
+    singular: odmsvc
+  scope: Namespaced
+  subresources:
+    status: {}
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
