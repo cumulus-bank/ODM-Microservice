@@ -9,5 +9,3 @@ spec:
     link: "http://cumulusbankodm-ibm-odm-dev.default:9060/DecisionService/rest/BankingDemo/1.0/getCreditCardOffers/1.0"
   routes:
     host: "odm-svc-kubeapp.apps.9.30.210.207.nip.io"
-  
-  
