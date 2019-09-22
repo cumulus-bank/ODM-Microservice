@@ -110,22 +110,22 @@ spec:
             mountPath: {{ template "odm-baiemitterconfig-dir" . }}
           {{- end}}
     #      {{- end}}
-          readinessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /decisioncenter/healthCheck
-              port: 9060
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-          livenessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /decisioncenter/healthCheck
-              port: 9060
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          # readinessProbe:
+          #   httpGet:
+          #     scheme: HTTP
+          #     path: /decisioncenter/healthCheck
+          #     port: 9060
+          #   initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          #   periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          #   failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          # livenessProbe:
+          #   httpGet:
+          #     scheme: HTTP
+          #     path: /decisioncenter/healthCheck
+          #     port: 9060
+          #   initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          #   periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          #   failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
       {{- if (not (empty .Values.image.pullSecrets )) }}
