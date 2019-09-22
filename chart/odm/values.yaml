@@ -19,7 +19,7 @@ livenessProbe:
   periodSeconds: 10
 image:
   name: odmbanksvc
-  imageName: "mycluster.icp:8500/default/odm-microservice:0.0.1" 
+  imageName: "s4saif/cumulus-odm-microservice:latest" 
   imagePullPolicy: Always
   ports:
     containerPort: 3005
