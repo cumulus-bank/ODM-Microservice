@@ -1,0 +1,134 @@
+{{- if semverCompare ">=1.11.1" .Capabilities.KubeVersion.GitVersion }}
+apiVersion: apps/v1
+{{- else if .Capabilities.APIVersions.Has "apps/v1beta2" }}
+apiVersion: apps/v1beta2
+{{- else }}
+apiVersion: apps/v1beta1
+{{- end }}
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+      run: {{ template "name" . }}
+  template:
+    metadata:
+      labels:
+        run: {{ template "name" . }}
+        app: {{ template "name" . }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+      annotations:
+        productName: {{ .Chart.Description | quote }}
+        productID: "OperationalDecisionManagerForDevelopers"
+        productVersion: {{ .Chart.AppVersion }}
+    spec:
+{{ include "odm-spec-security-context" . | indent 6 }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          #If you specify multiple nodeSelectorTerms associated with nodeAffinity types,
+          #then the pod can be scheduled onto a node if one of the nodeSelectorTerms is satisfied.
+          #
+          #If you specify multiple matchExpressions associated with nodeSelectorTerms,
+          #then the pod can be scheduled onto a node only if all matchExpressions can be satisfied.
+          #
+          #valid operators: In, NotIn, Exists, DoesNotExist, Gt, Lt
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: beta.kubernetes.io/arch
+                operator: In
+                values:
+                - {{ .Values.image.arch }}
+      volumes:
+      {{- if and .Values.internalDatabase.persistence.enabled (empty .Values.externalDatabase.serverName) }}
+      - name: {{ template "fullname" . }}-volume
+        persistentVolumeClaim:
+          claimName: {{ template "odm.persistenceclaim.fullname" . }}
+      {{- end }}
+      {{- if not (empty (.Values.customization.baiEmitterSecretRef)) }}
+      - name: {{ template "odm-baiemitterconfig-secret-volume.fullname" . }}
+        secret:
+          secretName: {{ .Values.customization.baiEmitterSecretRef }}
+      {{- end}}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ template "odm.repository.name" . }}/odm:{{ .Values.image.tag }}_{{ .Chart.Version }}{{ template "platform" . }}
+{{ include "odm-security-context" . | indent 10 }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: LICENSE
+            value: "{{ .Values.license }}"
+          {{- if empty .Values.externalDatabase.serverName }}
+          - name: DB_TYPE
+            value: "h2"
+          {{- if eq .Values.decisionCenter.persistenceLocale "en_US" }}
+          - name: SAMPLE
+            value: "{{ .Values.internalDatabase.populateSampleData }}"
+          {{- end }}
+          {{- else }}
+          - name: DB_TYPE
+            value: "postgresql"
+          - name: DB_SERVER_NAME
+            value: "{{ .Values.externalDatabase.serverName }}"
+          - name: DB_PORT_NUMBER
+            value: "{{ .Values.externalDatabase.port }}"
+          - name: DB_NAME
+            value: "{{ .Values.externalDatabase.databaseName }}"
+          - name: DB_USER
+            value: "{{ .Values.externalDatabase.user }}"
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "odm.secret.fullname" . }}
+                key: db-password
+          {{- end }}
+          - name: DC_PERSISTENCE_LOCALE
+            value: "{{ .Values.decisionCenter.persistenceLocale }}"
+          - name: "RELEASE_NAME"
+            value: {{ .Release.Name }}
+          ports:
+          - containerPort: 9060
+    #      {{- if or (not (empty (.Values.customization.baiEmitterSecretRef))) (and .Values.internalDatabase.persistence.enabled (empty .Values.externalDatabase.serverName)) }}
+          volumeMounts:
+          {{- if and .Values.internalDatabase.persistence.enabled (empty .Values.externalDatabase.serverName) }}
+          - name: {{ template "fullname" . }}-volume
+            mountPath: /config/dbdata/
+          {{- end }}
+          {{- if not (empty (.Values.customization.baiEmitterSecretRef)) }}
+          - name: {{ template "odm-baiemitterconfig-secret-volume.fullname" . }}
+            readOnly: true
+            mountPath: {{ template "odm-baiemitterconfig-dir" . }}
+          {{- end}}
+    #      {{- end}}
+          readinessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /decisioncenter/healthCheck
+              port: 9060
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /decisioncenter/healthCheck
+              port: 9060
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+      {{- if (not (empty .Values.image.pullSecrets )) }}
+      imagePullSecrets:
+      - name: {{ .Values.image.pullSecrets }}
+      {{- end }}

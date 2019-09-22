@@ -1,0 +1,306 @@
+## Image parameters
+image:
+  __metadata:
+    label: "Image"
+    description: "The Docker image parameters."
+  repository:
+    __metadata:
+      label: "Repository"
+      description: "Specify the repository used to retrieve the Docker image."
+      type: "string"
+      required: true
+  tag:
+    __metadata:
+      label: "Tag"
+      description: "Specify the tag for the Docker image."
+      type: "string"
+      required: true
+  pullPolicy:
+    __metadata:
+      label: "Pull policy"
+      description: "Specify the pull policy for the Docker image."
+      type: "string"
+      required: true
+      options:
+        -
+          label: "If not present"
+          value: "IfNotPresent"
+        -
+          label: "Always"
+          value: "Always"
+        -
+          label: "Never"
+          value: "Never"
+## Optionally specify an array of imagePullSecrets.
+## Secrets must be manually created in the namespace.
+## ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+##  - name: admin.registrykey
+  pullSecrets:
+    __metadata:
+      label: "Pull secrets"
+      description: "Specify the pull secrets for the Docker image."
+      type: "string"
+      required: false
+## Architecture
+## You can use kubectl version command to determine the architecture on the
+## desired worker node.
+## Only amd64 is supported for ibm-odm-dev.
+  arch:
+    __metadata:
+      label: "Architecture"
+      description: "Specify the architecture for the Docker image."
+      type: "string"
+      required: true
+      options:
+        -
+          label: "AMD64"
+          value: "amd64"
+        -
+          label: "PPC64LE"
+          value: "ppc64le"
+        -
+          label: "s390x"
+          value: "s390x"
+
+
+## Resource parameters
+resources:
+  __metadata:
+    label: "Resources"
+    description: "The resources required."
+  requests:
+    cpu:
+      __metadata:
+          label: "CPU request"
+          description: "Specify the requested CPU."
+          type: "string"
+          required: true
+    memory:
+      __metadata:
+          label: "Memory request"
+          description: "Specify the requested memory."
+          type: "string"
+          required: true
+  limits:
+    cpu:
+      __metadata:
+          label: "CPU limit"
+          description: "Specify the CPU limit."
+          type: "string"
+          required: true
+    memory:
+      __metadata:
+          label: "Memory limit"
+          description: "Specify the memory limit."
+          type: "string"
+          required: true
+
+## Decision Center parameters
+decisionCenter:
+  __metadata:
+    label: "Decision Center"
+    description: "The Decision Center parameters."
+  persistenceLocale:
+    __metadata:
+      label: "Persistence locale"
+      description: "Specify the persistence locale for Decision Center."
+      type: "string"
+      required: true
+      options:
+        -
+          label: "Arabic (Egypt)"
+          value: "ar_EG"
+        -
+          label: "Chinese (China)"
+          value: "zh_CN"
+        -
+          label: "Chinese (Taiwan)"
+          value: "zh_TW"
+        -
+          label: "Dutch (Netherlands)"
+          value: "nl_NL"
+        -
+          label: "English (United Kingdom)"
+          value: "en_GB"
+        -
+          label: "English (United States)"
+          value: "en_US"
+        -
+          label: "French (France)"
+          value: "fr_FR"
+        -
+          label: "German (Germany)"
+          value: "de_DE"
+        -
+          label: "Hebrew (Israel)"
+          value: "iw_IL"
+        -
+          label: "Italian (Italy)"
+          value: "it_IT"
+        -
+          label: "Japanese (Japan)"
+          value: "ja_JP"
+        -
+          label: "Korean (Korea)"
+          value: "ko_KR"
+        -
+          label: "Polish (Poland)"
+          value: "pl_PL"
+        -
+          label: "Portuguese (Brazil)"
+          value: "pt_BR"
+        -
+          label: "Russian (Russia)"
+          value: "ru_RU"
+        -
+          label: "Spanish (Spain)"
+          value: "es_ES"
+
+## Internal database parameters
+internalDatabase:
+  __metadata:
+    label: "H2 internal database"
+    description: "The internal database parameters."
+  populateSampleData:
+    __metadata:
+      label: "Populate sample data"
+      description: "Specify whether to provide sample data in the internal database. Only if the persistence locale for Decision Center is set to English (US)."
+      type: "boolean"
+      required: true
+  persistence:
+    enabled:
+      __metadata:
+        label: "Enable persistence in persistent volume"
+        description: "Specify whether to enable persistence for the internal database in a persistent volume."
+        type: "boolean"
+        required: true
+    useDynamicProvisioning:
+      __metadata:
+        label: "Use dynamic provisioning for persistent volume"
+        description: "When this parameter is false, the binding process selects an existing volume. Ensure that an unbound volume exists before you install the chart."
+        type: "boolean"
+        required: true
+    storageClassName:
+      __metadata:
+        label: "Storage class name for persistent volume"
+        description: "Specify the storage class name for persistent volume. If this parameter is left empty, the default storage class is used."
+        type: "string"
+        required: false
+    resources:
+      requests:
+        storage:
+          __metadata:
+            label: "Storage size for persistent volume"
+            description: "Specify the storage size for persistent volume."
+            type: "string"
+            required: true
+
+## External database parameters
+externalDatabase:
+  __metadata:
+    label: "PostgreSQL external database"
+    description: "The external database parameters."
+  serverName:
+    __metadata:
+      label: "Server name"
+      description: "Specify the name of the server running the external database. If it is not specified, the H2 internal database is used."
+      type: "string"
+      required: false
+  databaseName:
+    __metadata:
+      label: "Database name"
+      description: "Specify the name of the external database."
+      type: "string"
+      required: false
+  user:
+    __metadata:
+      label: "User name"
+      description: "Specify the name of the user used to connect to the external database."
+      type: "string"
+      required: false
+  password:
+    __metadata:
+      label: "Password"
+      description: "Specify the password of the user used to connect to the external database."
+      type: "password"
+      required: false
+  port:
+    __metadata:
+      label: "Port"
+      description: "Specify the port used to connect to the external database."
+      type: "number"
+      required: true
+
+## Readiness probe parameters
+readinessProbe:
+  __metadata:
+    label: "Readiness probe"
+    description: "The readiness probe parameters."
+  initialDelaySeconds:
+    __metadata:
+      label: "Initial delay in seconds"
+      description: "Specify the number of seconds after the container has started before readiness probe is initiated."
+      type: "number"
+      required: true
+  periodSeconds:
+    __metadata:
+      label: "Period in seconds"
+      description: "Specify how often (in seconds) to perform the probe."
+      type: "number"
+      required: true
+  failureThreshold:
+    __metadata:
+      label: "Failure threshold in seconds"
+      description: "Specify how many times Kubernetes will try before giving up when a pod starts and the probe fails. Giving up means marking the pod as Unready."
+      type: "number"
+      required: true
+
+## Liveness probe parameters
+livenessProbe:
+  __metadata:
+    label: "Liveness probe"
+    description: "The liveness probe parameters."
+  initialDelaySeconds:
+    __metadata:
+      label: "Initial delay in seconds"
+      description: "Specify the number of seconds after the container has started before liveness probe is initiated."
+      type: "number"
+      required: true
+  periodSeconds:
+    __metadata:
+      label: "Period in seconds"
+      description: "Specify how often (in seconds) to perform the probe."
+      type: "number"
+      required: true
+  failureThreshold:
+    __metadata:
+      label: "Failure threshold in seconds"
+      description: "Specify how many times Kubernetes will try before giving up when a pod starts and the probe fails. Giving up means restarting the pod."
+      type: "number"
+      required: true
+
+## Customization
+customization:
+  __metadata:
+    label: "Customization"
+    description: "The customization parameters."
+  baiEmitterSecretRef:
+      __metadata:
+        label: "Business Automation Insights emitter secret reference"
+        description: "Specify the name of the secret that contains the configuration files required to use the IBM Business Automation Insights emitter."
+        type: "string"
+        required: false
+
+license:
+  __metadata:
+    label: "License"
+    description: "Please read and accept the license agreement"
+    type: "string"
+    required: true
+    options:
+    - label: "Accepted"
+      value: "accept"
+    - label: "Not accepted"
+      value: "not accepted"
+    - label: "View"
+      value: "view"
