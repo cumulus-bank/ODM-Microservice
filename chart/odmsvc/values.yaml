@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 1
 namespace: "cumulusbank"
 metadata:
  name: odmbanksvc 
@@ -39,7 +39,7 @@ hpa:
     name: odmbanksvcmicroservicehpa
   spec:
     maxReplicas: 10
-    minReplicas: 2
+    minReplicas: 1
   metrics:
     pods:
       targetAverageValue: 30
