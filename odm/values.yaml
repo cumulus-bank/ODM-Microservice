@@ -36,11 +36,11 @@ image:
 
 resources:
   requests:
-    cpu: 1
-    memory: 1024Mi
+    cpu: 4
+    memory: 3072Mi
   limits:
-    cpu: 2
-    memory: 2048Mi
+    cpu: 6
+    memory: 6144Mi
 
 decisionCenter:
   persistenceLocale: en_US
